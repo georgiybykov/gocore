@@ -11,45 +11,46 @@ import (
 
 var (
 	urls  = [2]string{"https://go.dev", "https://golang.org"}
-	depth = 1 // 3
+	depth = 2
 )
 
 func main() {
+	arg := extractArg()
+
 	fmt.Println("Start searching...")
 
-	argument := extractArgument()
-	documents := scan(urls, depth, argument)
+	documents := scan(urls, depth, arg)
 	render(documents)
 }
 
-func scan(urls [2]string, depth int, argument string) (documents []crawler.Document) {
-	scanner := spider.New()
+func scan(urls [2]string, depth int, arg string) (docs []crawler.Document) {
+	spider := spider.New()
 
 	for _, url := range urls {
-		result, error := scanner.Scan(url, depth)
+		result, error := spider.Scan(url, depth)
 		if error != nil {
 			fmt.Printf("An error occurred while searching by URL %q\n", url)
 			continue
 		}
 
-		documents = append(documents, result...)
+		docs = append(docs, result...)
 	}
 
-	if len(argument) > 0 {
-		return filter(documents, argument)
+	if len(arg) > 0 {
+		return filter(docs, arg)
 	}
-	return documents
+	return docs
 }
 
-func filter(documents []crawler.Document, argument string) (filteredDocuments []crawler.Document) {
-	for _, document := range documents {
-		title := strings.ToLower(document.Title)
+func filter(documents []crawler.Document, arg string) (docs []crawler.Document) {
+	for _, doc := range documents {
+		title := strings.ToLower(doc.Title)
 
-		if strings.Contains(title, argument) {
-			filteredDocuments = append(filteredDocuments, document)
+		if strings.Contains(title, arg) {
+			docs = append(docs, doc)
 		}
 	}
-	return filteredDocuments
+	return docs
 }
 
 func render(documents []crawler.Document) {
@@ -60,21 +61,21 @@ func render(documents []crawler.Document) {
 
 	fmt.Println("Documets:")
 
-	for index, document := range documents {
-		if document.Body != "" {
-			fmt.Printf("%d. %q (%q): %q\n", index, document.Title, document.URL, document.Body)
+	for idx, doc := range documents {
+		if doc.Body != "" {
+			fmt.Printf("%d. %q (%q): %q\n", idx, doc.Title, doc.URL, doc.Body)
 		} else {
-			fmt.Printf("%d. %q (%q)\n", index, document.Title, document.URL)
+			fmt.Printf("%d. %q (%q)\n", idx, doc.Title, doc.URL)
 		}
 	}
 }
 
-func extractArgument() (argument string) {
-	flag.StringVar(&argument, "s", "", "Parameter for search")
+func extractArg() (arg string) {
+	flag.StringVar(&arg, "s", "", "Parameter for search")
 	flag.Parse()
 
-	if len(argument) > 0 {
-		argument = strings.ToLower(argument)
+	if len(arg) > 0 {
+		arg = strings.ToLower(arg)
 	}
-	return argument
+	return arg
 }
