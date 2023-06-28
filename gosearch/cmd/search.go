@@ -9,13 +9,8 @@ import (
 	"gocore/gosearch/pkg/crawler/spider"
 )
 
-var (
-	urls  = [2]string{"https://go.dev", "https://golang.org"}
-	depth = 2
-)
-
 func main() {
-	arg := extractArg()
+	urls, depth, arg := prepareParams()
 
 	fmt.Println("Start searching...")
 
@@ -70,12 +65,16 @@ func render(documents []crawler.Document) {
 	}
 }
 
-func extractArg() (arg string) {
+func prepareParams() (urls [2]string, depth int, arg string) {
+	urls = [2]string{"https://go.dev", "https://golang.org"}
+	depth = 2
+
 	flag.StringVar(&arg, "s", "", "Parameter for search")
 	flag.Parse()
 
 	if len(arg) > 0 {
 		arg = strings.ToLower(arg)
 	}
-	return arg
+
+	return urls, depth, arg
 }
