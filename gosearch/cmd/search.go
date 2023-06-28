@@ -57,6 +57,7 @@ func render(documents []crawler.Document) {
 	fmt.Println("Documets:")
 
 	for idx, doc := range documents {
+		idx++
 		if doc.Body != "" {
 			fmt.Printf("%d. %q (%q): %q\n", idx, doc.Title, doc.URL, doc.Body)
 		} else {
