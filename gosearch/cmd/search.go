@@ -10,15 +10,29 @@ import (
 )
 
 func main() {
-	urls, depth, arg := prepareParams()
+	urls := [2]string{"https://go.dev", "https://www.practical-go-lessons.com/"}
+	depth := 1
+	var arg string
+
+	flag.StringVar(&arg, "s", "", "Parameter for search")
+	flag.Parse()
+
+	if len(arg) > 0 {
+		arg = strings.ToLower(arg)
+	}
 
 	fmt.Println("Start searching...")
 
-	documents := scan(urls, depth, arg)
+	documents := scan(urls, depth)
+
+	if len(arg) > 0 {
+		documents = filter(documents, arg)
+	}
+
 	render(documents)
 }
 
-func scan(urls [2]string, depth int, arg string) (docs []crawler.Document) {
+func scan(urls [2]string, depth int) (docs []crawler.Document) {
 	spider := spider.New()
 
 	for _, url := range urls {
@@ -29,10 +43,6 @@ func scan(urls [2]string, depth int, arg string) (docs []crawler.Document) {
 		}
 
 		docs = append(docs, result...)
-	}
-
-	if len(arg) > 0 {
-		return filter(docs, arg)
 	}
 	return docs
 }
@@ -64,18 +74,4 @@ func render(documents []crawler.Document) {
 			fmt.Printf("%d. %q (%q)\n", idx, doc.Title, doc.URL)
 		}
 	}
-}
-
-func prepareParams() (urls [2]string, depth int, arg string) {
-	urls = [2]string{"https://go.dev", "https://golang.org"}
-	depth = 2
-
-	flag.StringVar(&arg, "s", "", "Parameter for search")
-	flag.Parse()
-
-	if len(arg) > 0 {
-		arg = strings.ToLower(arg)
-	}
-
-	return urls, depth, arg
 }
