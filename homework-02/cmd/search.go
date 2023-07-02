@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"strings"
 
-	"gocore/gosearch/pkg/crawler"
-	"gocore/gosearch/pkg/crawler/spider"
+	"gocore/homework-02/pkg/crawler"
+	"gocore/homework-02/pkg/crawler/spider"
 )
 
 func main() {
 	urls := [2]string{"https://go.dev", "https://www.practical-go-lessons.com/"}
-	depth := 1
+	depth := 2
 	var arg string
 
 	flag.StringVar(&arg, "s", "", "Parameter for search")
