@@ -13,12 +13,11 @@ import (
 func main() {
 	urls := [2]string{"https://go.dev", "https://www.practical-go-lessons.com/"}
 	depth := 2
-	var lexeme string
 
-	flag.StringVar(&lexeme, "s", "", "Parameter for search")
+	lexeme := flag.String("s", "", "Parameter for search")
 	flag.Parse()
 
-	if len(lexeme) == 0 {
+	if len(*lexeme) == 0 {
 		fmt.Println("The lexeme to search for not found. Try: `go run [command] -s [lexeme]`")
 		return
 	}
@@ -34,9 +33,7 @@ func main() {
 	})
 
 	storage.Append(documents)
-
-	indices := storage.Search(lexeme)
-
+	indices := storage.Search(*lexeme)
 	documents = filter(documents, indices)
 
 	render(documents)
