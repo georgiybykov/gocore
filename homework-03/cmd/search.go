@@ -22,8 +22,6 @@ func main() {
 		return
 	}
 
-	storage := index.New()
-
 	fmt.Println("Start searching...")
 
 	documents := scan(urls, depth)
@@ -32,6 +30,7 @@ func main() {
 		return documents[i].ID < documents[j].ID
 	})
 
+	storage := index.New()
 	storage.Append(documents)
 	indices := storage.Search(*lexeme)
 	documents = filter(documents, indices)
