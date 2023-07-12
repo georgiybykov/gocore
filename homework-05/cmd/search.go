@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"sort"
 
-	"gocore/homework-03/pkg/crawler"
-	"gocore/homework-03/pkg/crawler/spider"
-	"gocore/homework-03/pkg/index"
+	"gocore/homework-05/pkg/crawler"
+	"gocore/homework-05/pkg/crawler/spider"
+	"gocore/homework-05/pkg/index"
+	"gocore/homework-05/pkg/repository"
 )
 
 func main() {
@@ -24,16 +25,27 @@ func main() {
 
 	fmt.Println("Start searching...")
 
-	documents := scan(urls, depth)
+	documents, _ := repository.Filter(*lexeme)
+	if documents != nil {
+		render(documents)
+		return
+	}
+
+	documents = scan(urls, depth)
 
 	sort.SliceStable(documents, func(i, j int) bool {
 		return documents[i].ID < documents[j].ID
 	})
 
-	storage := index.New()
-	storage.Append(documents)
-	indices := storage.Search(*lexeme)
+	indexer := index.New()
+	indexer.Append(documents)
+	indices := indexer.Search(*lexeme)
 	documents = filter(documents, indices)
+
+	error := repository.Push(documents, *lexeme)
+	if error != nil {
+		fmt.Printf("Error writing to the Documents repository:\n    - %v\n", error)
+	}
 
 	render(documents)
 }
