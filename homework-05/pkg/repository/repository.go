@@ -1,49 +1,27 @@
 package repository
 
 import (
-	"encoding/json"
-
-	"gocore/homework-05/pkg/crawler"
-	"gocore/homework-05/pkg/repository/filestore"
+	"bufio"
+	"io"
 )
 
-const StoreName = "documents.json"
+func Read(reader io.Reader) ([]byte, error) {
+	scanner := bufio.NewScanner(reader)
 
-func Filter(lexeme string) ([]crawler.Document, error) {
-	file, error := filestore.Fetch(StoreName)
-	if error != nil {
-		return nil, error
-	}
-	defer file.Close()
+	var bytes []byte
 
-	bytes, error := filestore.Read(file)
-	if error != nil {
-		return nil, error
+	for scanner.Scan() {
+		bytes = append(bytes, []byte(scanner.Text())...)
 	}
 
-	documents := make(map[string][]crawler.Document)
-	if error := json.Unmarshal(bytes, &documents); error != nil {
-		return nil, error
+	if err := scanner.Err(); err != nil {
+		return nil, err
 	}
 
-	return documents[lexeme], nil
+	return bytes, nil
 }
 
-func Push(documents []crawler.Document, lexeme string) error {
-	file, error := filestore.Create(StoreName)
-	if error != nil {
-		return error
-	}
-	defer file.Close()
-
-	list := make(map[string][]crawler.Document)
-	list[lexeme] = documents
-
-	bytes, error := json.MarshalIndent(list, "", "   ")
-	if error != nil {
-		return error
-	}
-
-	error = filestore.Write(file, bytes)
-	return error
+func Write(writer io.Writer, bytes []byte) error {
+	_, err := writer.Write(append(bytes, '\n'))
+	return err
 }

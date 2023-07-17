@@ -1,8 +1,11 @@
 package main
 
 import (
+	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
+	"os"
 	"sort"
 
 	"gocore/homework-05/pkg/crawler"
@@ -10,6 +13,8 @@ import (
 	"gocore/homework-05/pkg/index"
 	"gocore/homework-05/pkg/repository"
 )
+
+const FilePath = "./homework-05/pkg/repository/documents.json"
 
 func main() {
 	urls := [2]string{"https://go.dev", "https://www.practical-go-lessons.com/"}
@@ -25,27 +30,60 @@ func main() {
 
 	fmt.Println("Start searching...")
 
-	documents, _ := repository.Filter(*lexeme)
-	if documents != nil {
-		render(documents)
+	var documents []crawler.Document
+
+	if _, err := os.Stat(FilePath); err == nil {
+		file, err := os.Open(FilePath)
+		if err != nil {
+			fmt.Println("Error: ", err)
+			return
+		}
+		defer file.Close()
+
+		bytes, err := repository.Read(file)
+		if err != nil {
+			fmt.Printf("Error reading from the Documents repository:\n    - %v\n", err)
+			return
+		}
+
+		if err := json.Unmarshal(bytes, &documents); err != nil {
+			fmt.Println("Error: ", err)
+			return
+		}
+	} else if errors.Is(err, os.ErrNotExist) {
+		documents = scan(urls, depth)
+
+		sort.SliceStable(documents, func(i, j int) bool {
+			return documents[i].ID < documents[j].ID
+		})
+
+		file, err := os.Create(FilePath)
+		if err != nil {
+			fmt.Println("Error: ", err)
+			return
+		}
+		defer file.Close()
+
+		bytes, err := json.MarshalIndent(documents, "", "   ")
+		if err != nil {
+			fmt.Println("Error: ", err)
+			return
+		}
+
+		err = repository.Write(file, bytes)
+		if err != nil {
+			fmt.Printf("Error writing to the Documents repository:\n    - %v\n", err)
+			return
+		}
+	} else {
+		fmt.Println("Error: ", err)
 		return
 	}
-
-	documents = scan(urls, depth)
-
-	sort.SliceStable(documents, func(i, j int) bool {
-		return documents[i].ID < documents[j].ID
-	})
 
 	indexer := index.New()
 	indexer.Append(documents)
 	indices := indexer.Search(*lexeme)
 	documents = filter(documents, indices)
-
-	error := repository.Push(documents, *lexeme)
-	if error != nil {
-		fmt.Printf("Error writing to the Documents repository:\n    - %v\n", error)
-	}
 
 	render(documents)
 }
@@ -54,8 +92,8 @@ func scan(urls [2]string, depth int) (docs []crawler.Document) {
 	spider := spider.New()
 
 	for _, url := range urls {
-		doc, error := spider.Scan(url, depth)
-		if error != nil {
+		doc, err := spider.Scan(url, depth)
+		if err != nil {
 			fmt.Printf("An error occurred while searching by URL %q\n", url)
 			continue
 		}

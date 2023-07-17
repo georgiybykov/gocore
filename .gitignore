@@ -1,4 +1,4 @@
 # TODO: Uncomment further
 go.sum
 
-homework-05/pkg/repository/filestore/documents.json
+homework-05/pkg/repository/documents.json
