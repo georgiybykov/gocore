@@ -1,5 +1,9 @@
 package main
 
+import (
+	"io"
+)
+
 type User interface {
 	Age() int
 }
@@ -37,7 +41,13 @@ func (c Customer) Age() int {
 
 // 	result2 := OldestUser(employee1, employee2, employee3, customer1, customer2, customer3)
 
-// 	fmt.Printf("max age: %v \n type: %T", result2, result2)
+// 	fmt.Printf("max age: %v \n type: %T \n", result2, result2)
+
+// 	w := &bytes.Buffer{}
+
+// 	Print(w, 1, true, "Print", 3423, 4534.354, "this", "\n", nil, "line")
+
+// 	fmt.Println(w.String())
 // }
 
 func MaxAge(users ...User) (age int) {
@@ -66,4 +76,12 @@ func OldestUser(users ...any) (user any) {
 		}
 	}
 	return user
+}
+
+func Print(w io.Writer, args ...any) {
+	for _, arg := range args {
+		if s, ok := arg.(string); ok {
+			w.Write([]byte(s))
+		}
+	}
 }

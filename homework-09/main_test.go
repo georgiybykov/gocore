@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"reflect"
 	"testing"
 )
@@ -90,6 +91,36 @@ func Test_OldestUser(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := OldestUser(tt.users...); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("got OldestUser() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_Print(t *testing.T) {
+	tests := []struct {
+		name string
+		args []any
+		want string
+	}{
+		{
+			name: "Test case #1",
+			args: []any{1, true, "Print ", 3423, 4534.354, "this ", "\n ", nil, "line"},
+			want: "Print this \n line",
+		},
+		{
+			name: "Test case #2",
+			args: []any{1, true, 3423, 4534.354, nil},
+			want: "",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			w := &bytes.Buffer{}
+			Print(w, tt.args...)
+
+			if got := w.String(); got != tt.want {
+				t.Errorf("got Print() = %v, want %v", got, tt.want)
 			}
 		})
 	}
