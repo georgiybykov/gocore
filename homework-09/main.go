@@ -24,32 +24,6 @@ func (c Customer) Age() int {
 	return c.age
 }
 
-// func main() {
-// 	fmt.Println("a")
-
-// 	employee1 := Employee{age: 30}
-// 	employee2 := Employee{age: 13}
-// 	employee3 := Employee{age: 23}
-
-// 	customer1 := Customer{age: 15}
-// 	customer2 := Customer{age: 54}
-// 	customer3 := Customer{age: 34}
-
-// 	result1 := MaxAge(employee1, employee2, employee3, customer1, customer2, customer3)
-
-// 	fmt.Printf("max age: %v \n", result1)
-
-// 	result2 := OldestUser(employee1, employee2, employee3, customer1, customer2, customer3)
-
-// 	fmt.Printf("max age: %v \n type: %T \n", result2, result2)
-
-// 	w := &bytes.Buffer{}
-
-// 	Print(w, 1, true, "Print", 3423, 4534.354, "this", "\n", nil, "line")
-
-// 	fmt.Println(w.String())
-// }
-
 func MaxAge(users ...User) (age int) {
 	for _, user := range users {
 		if user.Age() > age {
