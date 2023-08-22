@@ -31,16 +31,39 @@ func (c Customer) Age() int {
 // 	customer2 := Customer{age: 54}
 // 	customer3 := Customer{age: 34}
 
-// 	result := MaxAge(employee1, employee2, employee3, customer1, customer2, customer3)
+// 	result1 := MaxAge(employee1, employee2, employee3, customer1, customer2, customer3)
 
-// 	fmt.Printf("max age: %v", result)
+// 	fmt.Printf("max age: %v \n", result1)
+
+// 	result2 := OldestUser(employee1, employee2, employee3, customer1, customer2, customer3)
+
+// 	fmt.Printf("max age: %v \n type: %T", result2, result2)
 // }
 
 func MaxAge(users ...User) (age int) {
 	for _, user := range users {
-		if age < user.Age() {
+		if user.Age() > age {
 			age = user.Age()
 		}
 	}
 	return age
+}
+
+func OldestUser(users ...any) (user any) {
+	var maxAge int
+
+	for _, u := range users {
+		if e, ok := u.(Employee); ok {
+			if e.age > maxAge {
+				user, maxAge = e, e.age
+			}
+		}
+
+		if c, ok := u.(Customer); ok {
+			if c.age > maxAge {
+				user, maxAge = c, c.age
+			}
+		}
+	}
+	return user
 }

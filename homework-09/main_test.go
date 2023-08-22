@@ -1,8 +1,11 @@
 package main
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
-func TestMaxAge(t *testing.T) {
+func Test_MaxAge(t *testing.T) {
 	tests := []struct {
 		name  string
 		users []User
@@ -42,6 +45,51 @@ func TestMaxAge(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := MaxAge(tt.users...); got != tt.want {
 				t.Errorf("got MaxAge() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_OldestUser(t *testing.T) {
+	tests := []struct {
+		name  string
+		users []any
+		want  any
+	}{
+		{
+			name: "When the users are employees",
+			users: []any{
+				Employee{age: 21},
+				Employee{age: 64},
+				Employee{age: 51},
+			},
+			want: Employee{age: 64},
+		},
+		{
+			name: "When the users are customers",
+			users: []any{
+				Customer{age: 31},
+				Customer{age: 73},
+				Customer{age: 47},
+			},
+			want: Customer{age: 73},
+		},
+		{
+			name: "When the users are employees and customers",
+			users: []any{
+				Employee{age: 44},
+				Employee{age: 37},
+				Customer{age: 55},
+				Customer{age: 23},
+			},
+			want: Customer{age: 55},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := OldestUser(tt.users...); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("got OldestUser() = %v, want %v", got, tt.want)
 			}
 		})
 	}
