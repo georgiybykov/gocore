@@ -70,6 +70,7 @@ func (s *Server) handler(conn net.Conn) {
 	for {
 		msg, _, err := r.ReadLine()
 		if err != nil {
+			fmt.Printf("Error reading from buffer:\n    - %v", err)
 			return
 		}
 
@@ -77,6 +78,7 @@ func (s *Server) handler(conn net.Conn) {
 
 		_, err = conn.Write(response)
 		if err != nil {
+			fmt.Printf("Error writing to the connection:\n    - %v", err)
 			return
 		}
 	}
