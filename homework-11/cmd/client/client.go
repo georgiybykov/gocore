@@ -4,21 +4,21 @@ import (
 	"bufio"
 	"fmt"
 	"log"
-	"net"
 	"os"
-	"strings"
+
+	"gocore/homework-11/pkg/netsrv/client"
 )
 
 func main() {
-	conn, err := net.Dial(protocol, address)
+	client, err := client.New()
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer conn.Close()
+	defer client.Close()
 	defer fmt.Println("Connection closed")
 
 	terminal := bufio.NewReader(os.Stdin)
-	server := bufio.NewReader(conn)
+	// server := bufio.NewReader(client.Conn)
 
 	for {
 		fmt.Println("Enter a lexeme to search for:")
@@ -29,21 +29,24 @@ func main() {
 		}
 
 		fmt.Printf("Searching for: %q\n", string(lexeme))
-		fmt.Fprintf(conn, "%s\n", string(lexeme))
 
-	HANDLER:
-		for {
-			bytes, _, err := server.ReadLine()
-			if err != nil {
-				log.Fatal(err)
-			}
+		client.Search(string(lexeme))
 
-			response := strings.TrimSpace(string(bytes))
-			if len(response) == 0 {
-				break HANDLER
-			}
+		// 	fmt.Fprintf(conn, "%s\n", string(lexeme))
 
-			fmt.Println(response)
-		}
+		// HANDLER:
+		// 	for {
+		// 		bytes, _, err := server.ReadLine()
+		// 		if err != nil {
+		// 			log.Fatal(err)
+		// 		}
+
+		// 		response := strings.TrimSpace(string(bytes))
+		// 		if len(response) == 0 {
+		// 			break HANDLER
+		// 		}
+
+		// 		fmt.Println(response)
+		// 	}
 	}
 }
